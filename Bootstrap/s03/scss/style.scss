@@ -1,0 +1,137 @@
+$form-label-font-weight: bold;
+
+// Wha does @mixins do? It avoids writing media query over and over again.
+/* Provides a semantic media query from the following:
+   respond above XX(screen sizes)
+   Respond below XX 
+   Respond between XX and XX
+*/
+#labels {
+    font-weight: $form-label-font-weight;
+}
+
+// step 1: Identify the breakpoints
+// LEGEND: Create a SaSS variable to enumerate breakpoints
+// NOTE: These breakpoints are customizable via SaSS
+
+$breakpoints: (
+    xs: 0,
+    sm: 576px,
+    md: 768px,
+    lg: 992px,
+    xl: 1200px,
+    xxl: 1400px
+);
+
+//step 2: Create the map values
+//This means that breakpoint value are only written once. Map values like these can be accessed using SaSS map-get function
+
+$breakpoint: map-get($breakpoints , sm);
+$breakpoint: map-get($breakpoints , md);
+$breakpoint: map-get($breakpoints, lg);
+$breakpoint: map-get($breakpoints, xl);
+$breakpoint: map-get($breakpoints, xxl);
+
+
+// step 3: create map-has-key function -  it ensure that key exist within the $breakpoints map
+
+@mixin respond-above ($breakpoint) {
+
+    // if the breakpoint exists in the map
+    @if map-has-key($breakpoints , $breakpoint ) {
+
+        //declare a variable to get the breakpoint value
+        $breakpoint-value: map-get($breakpoints , breakpoint);
+
+        //write the media query
+        @media (min-width: $breakpoint-value) {
+            @content;
+        }
+
+    }
+
+    @else {
+        //log a warning
+        @warn 'Invalid breakpoint: #{$breakpoint}.';
+    }
+
+}
+
+//to pass a value to the respond-above mixin in the form of a bootstrap breakpoint
+
+@include respond-above(sm) {
+    .card {
+        display: block;
+    }
+}
+
+//without this (@warn), the media query won't show up in your compiled CSS and you'll have no idea
+
+
+@mixin respond-below ($breakpoint) {
+    @if map-has-key($breakpoints , $breakpoint ) {
+
+        $breakpoint-value: map-get($breakpoints , $breakpoint);
+
+        @media (max-width: ($breakpoint-value - 1)) {
+            @content;
+        }
+    }
+
+    @else {
+        @warn 'Invalid breakpoint: #{$breakpoint}.';
+    }
+}
+
+@include respond-below(lg) {
+    .card {
+        display: block;
+
+    }
+
+    img {
+        width: 100%;
+        height: auto;
+    }
+}
+
+/* 
+    Respond Between
+    - it checks both lower and upper keys exists in the breakpoints before writing this in the media query
+    - we will check that both $lower and $upper keys exist in the $breakpoints map before writing it in the media query
+
+*/
+
+@mixin respond-between ($lower, $upper) {
+    @if map-has-key($breakpoints , $lower) and map-has-key($breakpoints , $upper) {
+
+
+        $lower-breakpoint: map-get($breakpoints , $lower );
+        $upper-breakpoint: map-get($breakpoints , $upper);
+
+        @media (min-width:$lower-breakpoint) and (max-width:($upper-breakpoint - 1)) {
+            @content;
+        }
+    }
+
+    @else {
+
+        //If lower breakpoint is invalid
+        @if (map-has-key($breakpoints , $lower)==false) {
+
+            //log a warning
+            @warn 'Invalid lower breakpoint: #{$lower}.';
+        }
+
+        @if (map-has-key($breakpoints , $upper)==false) {
+            @warn 'Invalid upper breakpoint: #{$upper}.';
+        }
+    }
+}
+
+@include respond-between(sm, xxl) {
+    .card img {
+        display: block;
+        height: 100%;
+    }
+}

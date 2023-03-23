@@ -1,0 +1,35 @@
+/* Provides a semantic media query from the following:
+   respond above XX(screen sizes)
+   Respond below XX 
+   Respond between XX and XX
+*/
+#labels {
+  font-weight: bold;
+}
+
+@media (min-width: ) {
+  .card {
+    display: block;
+  }
+}
+@media (max-width: 991px) {
+  .card {
+    display: block;
+  }
+  img {
+    width: 100%;
+    height: auto;
+  }
+}
+/* 
+    Respond Between
+    - it checks both lower and upper keys exists in the breakpoints before writing this in the media query
+    - we will check that both $lower and $upper keys exist in the $breakpoints map before writing it in the media query
+
+*/
+@media (min-width: 576px) and (max-width: 1399px) {
+  .card img {
+    display: block;
+    height: 100%;
+  }
+}
